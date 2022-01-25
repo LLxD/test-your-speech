@@ -1,12 +1,12 @@
 <script>
   import logo from "./assets/svelte.png";
-  import Counter from "./lib/Counter.svelte";
+  import Game from "./lib/Game.svelte";
 </script>
 
 <main>
   <img src={logo} alt="Svelte Logo" />
 
-  <Counter />
+  <Game />
 </main>
 
 <style>
