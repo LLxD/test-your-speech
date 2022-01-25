@@ -1,19 +1,19 @@
 <script>
   let word;
-  let loadWord = async () => {
-    await fetch(`https://random-word-api.herokuapp.com/word?number=1&swear=0`)
+  let loadWord = () => {
+    return fetch(`https://random-word-api.herokuapp.com/word?number=1&swear=0`)
       .then((r) => r.json())
       .then((data) => {
         word = data[0];
       });
   };
-  loadWord();
+
+  let count = 0;
 
   let output = "";
   let gameStart = false;
 
   const start = () => {
-    gameStart = true;
     const recognition = new webkitSpeechRecognition();
     recognition.interimResults = false;
     recognition.lang = "en-US";
@@ -21,34 +21,71 @@
     recognition.start();
     // This event happens when you talk in the microphone
     recognition.onresult = function (event) {
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          const content = event.results[i][0].transcript.trim();
-          output = content;
-        }
-      }
+      const content = event.results[0][0].transcript.trim();
+      output = content;
     };
-    console.log(output);
+    recognition.onspeechend = () => {
+      return;
+    };
+  };
+
+  const clean = (word) => {
+    const cleanedWord = word
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+    return cleanedWord;
+  };
+
+  let coinSound;
+  let correct;
+
+  const checkResult = (loadedWord, listenedWord) => {
+    if (clean(listenedWord).includes(clean(loadedWord))) {
+      correct = true;
+      setTimeout(() => (correct = false), 2000);
+      coinSound.play();
+      count++;
+      startGame();
+    }
+    return "FOI";
+  };
+
+  const startGame = () => {
+    gameStart = true;
+    loadWord()
+      .then(() => start())
+      .then(() => setTimeout(() => checkResult(word, output), 4000));
   };
 </script>
 
+<audio
+  src="https://www.myinstants.com/media/sounds/02-coin-snk-vs-capcom-svc-chaos-neo-geo-ost-neogeo.mp3"
+  preload="auto"
+  bind:this={coinSound}
+/>
+
 <div class="container">
   {#if word === undefined}
-    <h1>Carregando</h1>
-  {:else}
-    <h1>{word}</h1>
+    <h1>Vamos jogar!</h1>
+  {:else if gameStart}
+    <h1>{clean(word)}</h1>
   {/if}
   {#if output === ""}
     <h1>Começar!</h1>
   {:else}
-    <h1>{output}</h1>
+    <h1>{clean(output)}</h1>
+  {/if}
+  {#if correct}
+    <h2>Você acertou!</h2>
+  {/if}
+  {#if count !== 0}
+    <h2>Acertos: {count}</h2>
   {/if}
 </div>
 
-<button on:click={loadWord}> loadar </button>
-<button style="display:${gameStart ? 'none' : 'block'}" on:click={start}>
-  start
-</button>
+<button on:click={startGame}> Vamos lá! </button>
 
 <style>
   .container {
@@ -60,6 +97,14 @@
     color: #ff3e00;
     text-transform: uppercase;
     font-size: 4rem;
+    font-weight: 100;
+    line-height: 1.1;
+    text-align: center;
+  }
+  h2 {
+    color: rgb(82, 243, 42);
+    text-transform: uppercase;
+    font-size: 2rem;
     font-weight: 100;
     line-height: 1.1;
     text-align: center;
