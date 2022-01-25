@@ -1,0 +1,30 @@
+name: Deploy to build branch
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to build branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout :bellhop:
+        uses: actions/checkout@v2
+
+      - name: Install Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - name: install dependencies and build
+        run: |
+          yarn 
+          yarn build
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4.2.2
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: build # The folder the action should deploy.
