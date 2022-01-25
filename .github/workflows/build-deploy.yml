@@ -10,7 +10,7 @@ jobs:
     name: Deploy to build branch
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout :bellhop:
+      - name: Checkout
         uses: actions/checkout@v2
 
       - name: Install Node
