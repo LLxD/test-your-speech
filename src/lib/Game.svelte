@@ -25,7 +25,8 @@
       output = content;
     };
     recognition.onspeechend = () => {
-      return;
+      setTimeout(() => checkResult(word, output), 800);
+      setTimeout(() => startGame(), 2000);
     };
   };
 
@@ -34,7 +35,7 @@
       .toString()
       .toLowerCase()
       .replace(/\s+/g, "")
-      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?']/g, "");
     return cleanedWord;
   };
 
@@ -47,16 +48,13 @@
       setTimeout(() => (correct = false), 2000);
       coinSound.play();
       count++;
-      startGame();
     }
     return "FOI";
   };
 
   const startGame = () => {
     gameStart = true;
-    loadWord()
-      .then(() => start())
-      .then(() => setTimeout(() => checkResult(word, output), 4000));
+    loadWord().then(() => start());
   };
 </script>
 
@@ -85,21 +83,26 @@
   {/if}
 </div>
 
-<button on:click={startGame}> Vamos lá! </button>
+{#if !gameStart}
+  <button on:click={startGame}> Vamos lá! </button>
+{/if}
 
 <style>
   .container {
     display: grid;
     align-self: center;
     justify-self: center;
+    text-align: center;
+    padding: 1vw;
   }
   h1 {
     color: #ff3e00;
     text-transform: uppercase;
-    font-size: 4rem;
+    text-align: center;
+    font-size: 3em;
     font-weight: 100;
     line-height: 1.1;
-    text-align: center;
+    max-width: 100vw;
   }
   h2 {
     color: rgb(82, 243, 42);
@@ -107,7 +110,6 @@
     font-size: 2rem;
     font-weight: 100;
     line-height: 1.1;
-    text-align: center;
   }
 
   button {
