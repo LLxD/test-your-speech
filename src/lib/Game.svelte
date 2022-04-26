@@ -1,7 +1,7 @@
 <script>
   let word;
   let loadWord = () => {
-    return fetch(`https://random-word-api.herokuapp.com/word?number=1&swear=0`)
+    return fetch(`https://random-word-api.herokuapp.com/word?number=1`)
       .then((r) => r.json())
       .then((data) => {
         word = data[0];
